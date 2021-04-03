@@ -148,7 +148,7 @@ def isWinPlayer(player,board):
     else:
         return False
 
-def minimax(board,player):
+def minimax(board,player,alpha,beta):
     availMoves=getAvailMoves(board)
     if isWinPlayer(ai,board):            # if AI wins, AI gets maximum reward
         return 10
@@ -167,18 +167,22 @@ def minimax(board,player):
             move=availMoves[i]
             board[move[0]][move[1]]=player
             print("move played ",move,"by ", player)
-            result=minimax(board,nextPlayer)
+            result=minimax(board,nextPlayer,alpha=alpha,beta=beta)
             board[move[0]][move[1]]=0
             if player==ai:
-                if result>=10:
-                    return result
-                if result > best_score:
+                if result>best_score:
                     best_score=result
+                    if best_score>alpha:
+                        alpha=best_score
+                    if alpha>=beta:
+                        break
             else:
-                if result <=-10:
-                    return result
                 if result<best_score:
                     best_score=result
+                    if best_score<beta:
+                        beta=best_score
+                    if alpha>=beta:
+                        break
         return best_score
 
 def makeAiMove(best_move):
@@ -197,7 +201,7 @@ def playAi():
         print("inside play ai. avail moves are",availMoves)
         board[l[0]][l[1]]=ai
         print("move played ",l," by O")
-        result=minimax(board,human)
+        result=minimax(board,human,-99,99)
         board[l[0]][l[1]]=0
         if result > best_score:
             best_move=l
