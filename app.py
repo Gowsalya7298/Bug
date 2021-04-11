@@ -1,5 +1,6 @@
 from tkinter import *
 from copy import deepcopy
+from time import perf_counter
 
 #15x15 board
 data_board=[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
@@ -170,13 +171,13 @@ def minimax(board,player):
             result=minimax(board,nextPlayer)
             board[move[0]][move[1]]=0
             if player==ai:
-                if result>=10:
-                    return result
+                #if result>=10:
+                #    return result
                 if result > best_score:
                     best_score=result
             else:
-                if result <=-10:
-                    return result
+                #if result <=-10:
+                #    return result
                 if result<best_score:
                     best_score=result
         return best_score
@@ -193,6 +194,7 @@ def playAi():
     board=deepcopy(data_board)
     best_score=-99
     best_move=None
+    start=perf_counter()
     for l in availMoves:
         print("inside play ai. avail moves are",availMoves)
         board[l[0]][l[1]]=ai
@@ -202,6 +204,9 @@ def playAi():
         if result > best_score:
             best_move=l
             best_score=result
+    end=perf_counter()
+    ttaken=end-start
+    print("time taken is",ttaken)
     makeAiMove(best_move)
     
     

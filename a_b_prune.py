@@ -1,5 +1,6 @@
 from tkinter import *
 from copy import deepcopy
+from time import perf_counter
 
 #15x15 board
 data_board=[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
@@ -197,6 +198,7 @@ def playAi():
     board=deepcopy(data_board)
     best_score=-99
     best_move=None
+    start=perf_counter()
     for l in availMoves:
         print("inside play ai. avail moves are",availMoves)
         board[l[0]][l[1]]=ai
@@ -206,6 +208,9 @@ def playAi():
         if result > best_score:
             best_move=l
             best_score=result
+    end=perf_counter()
+    ttaken=end-start
+    print("The time taken is",ttaken)
     makeAiMove(best_move)
     
     
@@ -253,5 +258,7 @@ for i in range(0,size):
         board[i][j].col=j
         board[i][j].configure(command=board[i][j].onClick,width=root_width,height=root_height)
         board[i][j].grid(column=j,row=i) # set Button grid
-
+#playAi()
+#current="o"
+#n_move+=1
 root.mainloop()  #render screen
