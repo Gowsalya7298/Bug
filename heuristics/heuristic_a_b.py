@@ -17,7 +17,7 @@ root_height=None
 win=False
 human="x"
 ai="o"
-depth=3
+depth=1
 
 def getReducedMoves(board):            #function returns list of relavant available moves
     availMoves=set()
@@ -639,6 +639,10 @@ def minimax(board,player,alpha,beta,current):
     availMoves=getReducedMoves(board)
     availMoves=sortMoves(availMoves,board,player)
     if (current+1)>=depth:
+        if player=="x":
+            opponent="o"
+        else:
+            opponent="x"
         return heuristic(player,board)
     elif len(availMoves) == 0:         # if drawn, no reward
         return 0
