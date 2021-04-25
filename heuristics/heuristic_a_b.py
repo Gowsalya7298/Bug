@@ -605,9 +605,13 @@ def isWinPlayer(player,board):
 
 def sortMoves(availMoves,board,player):
     hl=[]
+    if player=="x":
+        opponent="o"
+    else:
+        opponent="x"
     for move in availMoves:
         board[move[0]][move[1]]=player
-        heu=heuristic(player,board)
+        heu=heuristic(player,board)-heuristic(opponent,board)
         hl.append(heu)
         board[move[0]][move[1]]=0
     
@@ -643,7 +647,7 @@ def minimax(board,player,alpha,beta,current):
             opponent="o"
         else:
             opponent="x"
-        return heuristic(player,board)
+        return (heuristic(player,board)-heuristic(opponent,board))
     elif len(availMoves) == 0:         # if drawn, no reward
         return 0
     else:
