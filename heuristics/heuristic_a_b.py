@@ -166,7 +166,7 @@ def evaluate_rows(row,col,player,board):
     start=False                         # cell index -1 is occupied by opponent?
     if (col-1)<0 or board[row][col-1]==opponent:
         start=True
-    elif board[row][col-1]==player:
+    elif (row-1)>=0 and (col-1)>=0 and board[row-1][col-1]==player:
         return None
     for j in range(col,col+5,1):
         if j<size:
@@ -280,7 +280,7 @@ def evaluate_cols(row,col,player,board):
     start=False                         # cell index -1 is occupied by opponent?
     if (row-1)<0 or board[row-1][col]==opponent:
         start=True
-    elif board[row-1][col]==player:
+    elif (row-1)>=0 and (col-1)>=0 and board[row-1][col-1]==player:
         return None
     for j in range(row,row+5,1):
         if j<size:
@@ -374,6 +374,161 @@ def evaluate_cols(row,col,player,board):
         }
     return dt
 
+def evaluate_diags(row,col,player,board):
+    
+    if player=="x":
+        opponent="o"
+    else:
+        opponent="x"
+
+    cont_count=0
+    single_marks=0
+    closed_one=0
+    closed_two=0
+    two_in_row=0
+    closed_three=0
+    three_in_row=0
+    straight_fours=0
+    four_in_row=0
+    five_in_row=0
+    start=False
+    canCheckLead=True
+    canCheckLag=True
+    #leading diagonal check
+    j=col
+    if (row-1)<0 or (col-1)<0 or board[row-1][col-1]==opponent:
+        start=True
+    elif (row-1)>=0 and (col-1)>=0 and board[row-1][col-1]==player:
+        canCheckLead=False
+    if canCheckLead:
+        for i in range(row,row+5):
+            if (i<size) and (j<size):
+                if board[i][j]==player:
+                    cont_count+=1
+                elif board[i][j]==opponent:
+                    if start==True:
+                        break 
+                    else:
+                        if cont_count==1:
+                            closed_one+=1
+                            cont_count=0
+                        elif cont_count==2:
+                            closed_two+=1
+                            cont_count=0
+                        elif cont_count==3:
+                            closed_three+=1
+                            cont_count=0
+                        elif cont_count==4:
+                            four_in_row+=1
+                            cont_count=0
+                        elif cont_count==5:
+                            five_in_row+=1
+                            cont_count=0
+
+                else:
+                            if cont_count==1:
+                                single_marks+=1
+                            elif cont_count==2:
+                                two_in_row+=1
+                            elif cont_count==3:
+                                three_in_row+=1
+                            elif cont_count==4:
+                                straight_fours+=1
+                            if single_marks==2:
+                                single_marks=1
+                            cont_count=0
+
+            else:
+                if start==False:
+                    if cont_count==4:
+                        straight_fours+=1
+                        cont_count=0
+            j+=1
+
+    dt={
+                        "closed_one":closed_one,
+                        "single_mark":single_marks,
+                        "closed_two":closed_two,
+                        "two_in_row":two_in_row,
+                        "closed_three":closed_three,
+                        "three_in_row":three_in_row,
+                        "four_in_row":four_in_row,
+                        "straight_fours":straight_fours,
+                        "five_in_row":five_in_row
+        }
+        
+    j=col
+    #check lagging diagonal
+    start=False
+    cont_count=0
+    single_marks=0
+    closed_one=0
+    closed_two=0
+    two_in_row=0
+    closed_three=0
+    three_in_row=0
+    straight_fours=0
+    four_in_row=0
+    five_in_row=0
+    if (row-1)<0 or (col+1)>=size or board[row-1][col+1]==opponent:
+        start=True
+    elif (row-1)>=0 and (col+1)<size and board[row-1][col+1]==player:
+        canCheckLag=False
+    if canCheckLag:
+        for i in range(row,row+5):
+            if (i<size) and (j>=0):
+                if board[i][j]==player:
+                    cont_count+=1
+                elif board[i][j]==opponent:
+                    if start==True:
+                        break 
+                    else:
+                        if cont_count==1:
+                            closed_one+=1
+                            cont_count=0
+                        elif cont_count==2:
+                            closed_two+=1
+                            cont_count=0
+                        elif cont_count==3:
+                            closed_three+=1
+                            cont_count=0
+                        elif cont_count==4:
+                            four_in_row+=1
+                            cont_count=0
+                        elif cont_count==5:
+                            five_in_row+=1
+                            cont_count=0
+
+                else:
+                            if cont_count==1:
+                                single_marks+=1
+                            elif cont_count==2:
+                                two_in_row+=1
+                            elif cont_count==3:
+                                three_in_row+=1
+                            elif cont_count==4:
+                                straight_fours+=1
+                            if single_marks==2:
+                                single_marks=1
+                            cont_count=0
+
+            else:
+                if start==False:
+                    if cont_count==4:
+                        straight_fours+=1
+                        cont_count=0
+            j-=1
+
+    dt["closed_one"]+=closed_one
+    dt["single_mark"]+=single_marks
+    dt["closed_two"]+=closed_two
+    dt["two_in_row"]+=two_in_row
+    dt["closed_three"]+=closed_three
+    dt["three_in_row"]+=three_in_row
+    dt["four_in_row"]+=four_in_row
+    dt["straight_fours"]+=straight_fours
+    dt["five_in_row"]+=five_in_row
+    return dt
 
 
 def heuristic(player,board):
@@ -385,7 +540,7 @@ def heuristic(player,board):
     w6=100000
     w7=1000000
     w8=10000000
-    w9=100000000 
+    w9=1000000000 
     n1=0
     n2=0
     n3=0
@@ -397,28 +552,40 @@ def heuristic(player,board):
     n9=0
     for i in range(size):
         for j in range(size):
-            dt=evaluate_rows(i,j,player,board)
-            if dt!=None:
-                n1+=dt["closed_one"]
-                n2+=dt["single_mark"]
-                n3+=dt["closed_two"]
-                n4+=dt["two_in_row"]
-                n5+=dt["closed_three"]
-                n6+=dt["three_in_row"]
-                n7+=dt["four_in_row"]
-                n8+=dt["straight_fours"]
-                n9+=dt["five_in_row"]
-            dt=evaluate_cols(i,j,player,board)
-            if dt!=None:
-                n1+=dt["closed_one"]
-                n2+=dt["single_mark"]
-                n3+=dt["closed_two"]
-                n4+=dt["two_in_row"]
-                n5+=dt["closed_three"]
-                n6+=dt["three_in_row"]
-                n7+=dt["four_in_row"]
-                n8+=dt["straight_fours"]
-                n9+=dt["five_in_row"]
+            if board[i][j]==player:
+                dt=evaluate_rows(i,j,player,board)
+                if dt!=None:
+                    n1+=dt["closed_one"]
+                    n2+=dt["single_mark"]
+                    n3+=dt["closed_two"]
+                    n4+=dt["two_in_row"]
+                    n5+=dt["closed_three"]
+                    n6+=dt["three_in_row"]
+                    n7+=dt["four_in_row"]
+                    n8+=dt["straight_fours"]
+                    n9+=dt["five_in_row"]
+                dt=evaluate_cols(i,j,player,board)
+                if dt!=None:
+                    n1+=dt["closed_one"]
+                    n2+=dt["single_mark"]
+                    n3+=dt["closed_two"]
+                    n4+=dt["two_in_row"]
+                    n5+=dt["closed_three"]
+                    n6+=dt["three_in_row"]
+                    n7+=dt["four_in_row"]
+                    n8+=dt["straight_fours"]
+                    n9+=dt["five_in_row"]
+                dt=evaluate_diags(i,j,player,board)
+                if dt!=None:
+                    n1+=dt["closed_one"]
+                    n2+=dt["single_mark"]
+                    n3+=dt["closed_two"]
+                    n4+=dt["two_in_row"]
+                    n5+=dt["closed_three"]
+                    n6+=dt["three_in_row"]
+                    n7+=dt["four_in_row"]
+                    n8+=dt["straight_fours"]
+                    n9+=dt["five_in_row"]
     rt=(n1*w1+n2*w2+n3*w3+n4*w4+n5*w5+n6*w6+n7*w7+n8*w8+n9*w9)
     if player==ai:
         return rt

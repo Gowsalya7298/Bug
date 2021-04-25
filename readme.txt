@@ -1,7 +1,8 @@
 ****Files overview*****
 app.py runs tic-tac-toe using the standard minimax algorithm
 a_b_prune.py runs the game using optimised Alpha-beta-prunning.
-
+/documents contain documents related to the project
+/heuristics/heuristic_a_b.py plays five in a row using heuristic based alpha beta prunning algorithm
 ****Installations Required*****
 Python 3.x, no other installations are required.
 
@@ -11,6 +12,8 @@ Python 3.x, no other installations are required.
     >python app.py
 3. To run the game using alpha beta prunning, run:
     >python a_b_prune.py
+4. To run FIVE IN A ROW using heuristic based alpha beta prunning, run:
+    >python .\heuristics\heuristic_a_b_prune.py
 
 ****Changing between Tic-tac-toe & 5-in-a-row*****
 1. in both the files, changing the values of two variables, will make the respective
