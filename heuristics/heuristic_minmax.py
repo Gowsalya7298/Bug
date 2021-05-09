@@ -31,6 +31,7 @@ def getReducedMoves(board):            #function returns list of relavant availa
                                 availMoves.add((i2,j2))
     return list(availMoves)
 
+
 def getAvailMoves(board):
     ls=[]
     for i in range(size):
@@ -133,6 +134,7 @@ def checkColumns(data_board,current=current):
 
 
 
+
 def isWin():
     global win
     print("is win called","current player is",current)
@@ -146,6 +148,18 @@ def isWin():
         win=True
         print(current," player won!"," win is",win)
     print("game still continues")
+
+
+def isWinPlayer(player,board):
+    global win
+    if checkColumns(board,player):
+        return True
+    elif checkRows(board,player):
+        return True
+    elif checkDiagonals(board,player):
+        return True
+    else:
+        return False
 
 def evaluate_rows(row,col,player,board):
     if player=="x":
@@ -597,16 +611,6 @@ def heuristic(player,board):
     rt=(n1*w1+n2*w2+n3*w3+n4*w4+n5*w5+n6*w6+n7*w7+n8*w8+n9*w9)
     return rt
 
-def isWinPlayer(player,board):
-    global win
-    if checkColumns(board,player):
-        return True
-    elif checkRows(board,player):
-        return True
-    elif checkDiagonals(board,player):
-        return True
-    else:
-        return False
 
 def sortMoves(availMoves,board,player):
     hl=[]
@@ -644,7 +648,7 @@ def sortMoves(availMoves,board,player):
     return availMoves
                 
 
-def minimax(board,player,alpha,beta,current):
+def minimax(board,player,current):
     availMoves=getReducedMoves(board)
     availMoves=sortMoves(availMoves,board,player)
     if (current+1)>=depth:
@@ -653,6 +657,7 @@ def minimax(board,player,alpha,beta,current):
         else:
             opponent="x"
         return (heuristic(ai,board)-heuristic(opponent,board))
+
     elif len(availMoves) == 0:         # if drawn, no reward
         return 0
     else:
@@ -666,63 +671,20 @@ def minimax(board,player,alpha,beta,current):
             move=availMoves[i]
             board[move[0]][move[1]]=player
             print("move played ",move,"by ", player)
-            result=minimax(board,nextPlayer,alpha=alpha,beta=beta,current=current+1)
+            result=minimax(board,nextPlayer,current+1)
             board[move[0]][move[1]]=0
             if player==ai:
-                if result>best_score:
+                #if result>=10:
+                #    return result
+                if result > best_score:
                     best_score=result
-                    if best_score>alpha:
-                        alpha=best_score
-                    if alpha>=beta:
-                        break
             else:
+                #if result <=-10:
+                #    return result
                 if result<best_score:
                     best_score=result
-                    if best_score<beta:
-                        beta=best_score
-                    if alpha>=beta:
-                        break
         return best_score
 
-
-"""
-def minimax(board,player,alpha,beta,current):
-    availMoves=getReducedMoves(board)
-    if isWinPlayer(ai,board):            # if AI wins, AI gets maximum reward
-        return 10
-    elif isWinPlayer(human,board):       # if human wins, AI gets minimum reward
-        return -10
-    elif len(availMoves) == 0:         # if drawn, no reward
-        return 0
-    else:
-        if player==ai:
-            best_score=-99
-            nextPlayer=human
-        else:
-            best_score=99
-            nextPlayer=ai
-        for i in range(len(availMoves)):
-            move=availMoves[i]
-            board[move[0]][move[1]]=player
-            print("move played ",move,"by ", player)
-            result=minimax(board,nextPlayer,alpha=alpha,beta=beta)
-            board[move[0]][move[1]]=0
-            if player==ai:
-                if result>best_score:
-                    best_score=result
-                    if best_score>alpha:
-                        alpha=best_score
-                    if alpha>=beta:
-                        break
-            else:
-                if result<best_score:
-                    best_score=result
-                    if best_score<beta:
-                        beta=best_score
-                    if alpha>=beta:
-                        break
-        return best_score
-"""
 def makeAiMove(best_move):
     global data_board
     print("inside make AI move. best move is",best_move)
@@ -741,14 +703,14 @@ def playAi():
         print("inside play ai. avail moves are",availMoves)
         board[l[0]][l[1]]=ai
         print("move played ",l," by O")
-        result=minimax(board,human,-9999999999,9999999999,0)
+        result=minimax(board,human,0)
         board[l[0]][l[1]]=0
         if result > best_score:
             best_move=l
             best_score=result
     end=perf_counter()
     ttaken=end-start
-    print("The time taken is",ttaken)
+    print("time taken is",ttaken)
     makeAiMove(best_move)
     
     
@@ -796,7 +758,5 @@ for i in range(0,size):
         board[i][j].col=j
         board[i][j].configure(command=board[i][j].onClick,width=root_width,height=root_height)
         board[i][j].grid(column=j,row=i) # set Button grid
-#playAi()
-#current="o"
-#n_move+=1
+
 root.mainloop()  #render screen
