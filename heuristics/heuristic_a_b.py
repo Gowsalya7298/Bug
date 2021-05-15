@@ -1,6 +1,10 @@
 from tkinter import *
 from copy import deepcopy
 from time import perf_counter
+from typing import List
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
+NavigationToolbar2Tk)
 
 #15x15 board
 data_board=[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
@@ -18,6 +22,7 @@ win=False
 human="x"
 ai="o"
 depth=2
+time_array=list()
 
 def getReducedMoves(board):            #function returns list of relavant available moves
     availMoves=set()
@@ -729,6 +734,64 @@ def makeAiMove(best_move):
     board[best_move[0]][best_move[1]].configure(text=ai)
     data_board[best_move[0]][best_move[1]]=ai
 
+
+
+
+def plot(y):
+  
+    # the figure that will contain the plot
+    fig = Figure(figsize = (5, 5),
+                 dpi = 100)
+ 
+    # adding the subplot
+    plot1 = fig.add_subplot(111,picker=True)
+    # plotting the graph
+    plot1.plot(y)
+    plot1.set_xlabel("No. of Moves")
+    plot1.set_ylabel("Decision time in seconds")
+    plot1.title.set_text("Time taken by AI to decide")
+    
+    #annot.set_visible(True)
+
+    def update_annot(xdata,ydata,pos):
+        annot.xy=pos
+        #annot.y=pos[1]
+        vis=annot.get_visible()
+        if vis:
+            annot.set_visible(False)
+            fig.canvas.draw_idle()
+        else:
+            text =str(round(ydata,ndigits=2))+" s"
+            annot.set_text(text)
+            annot.get_bbox_patch().set_alpha(0.4)
+            annot.set_visible(True)
+            fig.canvas.draw_idle()
+        return
+
+    print("sub plot object",plot1)
+    # creating the Tkinter canvas
+    # containing the Matplotlib figure
+    canvas = FigureCanvasTkAgg(fig,
+                               master = root)  
+
+    def onpick(event):
+        print(event)    
+        xdata=event.mouseevent.xdata
+        ydata=event.mouseevent.ydata
+        pos=(xdata,ydata)
+        print("click loc",pos)
+        update_annot(xdata=xdata,ydata=ydata,pos=pos)
+        return
+    
+    canvas.mpl_connect('pick_event', onpick)
+    canvas.draw()
+  
+    # placing the canvas on the Tkinter window
+    canvas.get_tk_widget().grid(row=0,column=size+1,rowspan=13)
+    annot = plot1.annotate("", xy=(0,0), xytext=(20,20),textcoords="offset points",bbox=dict(boxstyle="round", fc="w"),arrowprops=dict(arrowstyle="->"))
+    annot.set_visible(False)
+ 
+
 def playAi():
     print("AI thinking")
     availMoves=getReducedMoves(data_board)
@@ -748,6 +811,8 @@ def playAi():
             best_score=result
     end=perf_counter()
     ttaken=end-start
+    time_array.append(ttaken)
+    plot(y=time_array)
     print("The time taken is",ttaken)
     makeAiMove(best_move)
     
@@ -778,9 +843,13 @@ def onClick(obj):                      #callback function for each button's clic
 
 
 
+#function to draw chart in GUI
+
+ 
+  
 root=Tk()
 root.title="Five in a row"
-root.geometry('500x650')
+root.geometry('1000x650')
 root_width=3
 print(root_width)
 root_height=2
