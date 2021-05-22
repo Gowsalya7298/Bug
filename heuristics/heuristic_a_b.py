@@ -1,15 +1,27 @@
 from tkinter import *
-from copy import deepcopy
+from copy import copy, deepcopy
 from time import perf_counter
 from typing import List
+from matplotlib import colors
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
 NavigationToolbar2Tk)
+from threading import Thread
+import matplotlib.pyplot as plt
+import time
+from tkinter.font import Font
+
+plt.style.use('dark_background')
 
 #15x15 board
 data_board=[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
 # board of buttons
 board=[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
+#label board
+label_board=[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
+# data_board copy
+data_board_copy=[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
+minmaxFinished=False
 current="x"
 size=15
 canPlay=True
@@ -22,7 +34,13 @@ win=False
 human="x"
 ai="o"
 depth=2
-time_array=list()
+time_array=[0]
+minmax_time_array=[0]
+ab_text="Alpha Beta Prunning "
+mm_text="Minimax "
+
+x_color="#c327ab"
+y_color="#ffc045"
 
 def getReducedMoves(board):            #function returns list of relavant available moves
     availMoves=set()
@@ -49,7 +67,7 @@ def getAvailMoves(board):
 def laggingDiagonalCheck(index,index_type,max,data_board,current=current):   #index_type=row|col
             count=0
             if index_type=="col":
-                for row in range(max):
+                for row in range(max+1):
                     if data_board[row][index]==current:
                         count+=1
                         if count>=win_moves:
@@ -150,6 +168,8 @@ def isWin():
     elif checkDiagonals(data_board,current):
         win=True
         print(current," player won!"," win is",win)
+    if win==True:
+        indicator_label.configure(text="{0} player won!".format(current))
     print("game still continues")
 
 def evaluate_rows(row,col,player,board):
@@ -648,6 +668,45 @@ def sortMoves(availMoves,board,player):
                     availMoves[j]=tmp
     return availMoves
                 
+#ordinary minmax
+def ominimax(board,player,current):
+    availMoves=getReducedMoves(board)
+    availMoves=sortMoves(availMoves,board,player)
+    if (current+1)>=depth:
+        if ai=="x":
+            opponent="o"
+        else:
+            opponent="x"
+        return (heuristic(ai,board)-heuristic(opponent,board))
+
+    elif len(availMoves) == 0:         # if drawn, no reward
+        return 0
+    else:
+        if player==ai:
+            best_score=-9999999999
+            nextPlayer=human
+        else:
+            best_score=9999999999
+            nextPlayer=ai
+        for i in range(len(availMoves)):
+            move=availMoves[i]
+            board[move[0]][move[1]]=player
+            print("move played ",move,"by ", player)
+            result=ominimax(board,nextPlayer,current+1)
+            board[move[0]][move[1]]=0
+            if player==ai:
+                #if result>=10:
+                #    return result
+                if result > best_score:
+                    best_score=result
+            else:
+                #if result <=-10:
+                #    return result
+                if result<best_score:
+                    best_score=result
+        return best_score
+
+
 
 def minimax(board,player,alpha,beta,current):
     availMoves=getReducedMoves(board)
@@ -690,68 +749,56 @@ def minimax(board,player,alpha,beta,current):
         return best_score
 
 
-"""
-def minimax(board,player,alpha,beta,current):
-    availMoves=getReducedMoves(board)
-    if isWinPlayer(ai,board):            # if AI wins, AI gets maximum reward
-        return 10
-    elif isWinPlayer(human,board):       # if human wins, AI gets minimum reward
-        return -10
-    elif len(availMoves) == 0:         # if drawn, no reward
-        return 0
-    else:
-        if player==ai:
-            best_score=-99
-            nextPlayer=human
-        else:
-            best_score=99
-            nextPlayer=ai
-        for i in range(len(availMoves)):
-            move=availMoves[i]
-            board[move[0]][move[1]]=player
-            print("move played ",move,"by ", player)
-            result=minimax(board,nextPlayer,alpha=alpha,beta=beta)
-            board[move[0]][move[1]]=0
-            if player==ai:
-                if result>best_score:
-                    best_score=result
-                    if best_score>alpha:
-                        alpha=best_score
-                    if alpha>=beta:
-                        break
-            else:
-                if result<best_score:
-                    best_score=result
-                    if best_score<beta:
-                        beta=best_score
-                    if alpha>=beta:
-                        break
-        return best_score
-"""
 def makeAiMove(best_move):
-    global data_board
-    print("inside make AI move. best move is",best_move)
+    global data_board,current
+    print(" make AI move, called from evalAB. best move is",best_move)
     board[best_move[0]][best_move[1]].configure(text=ai)
+    print("data_board configured")
+    #label_board[best_move[0]][best_move[1]].configure(text=ai)
     data_board[best_move[0]][best_move[1]]=ai
+    print("data board changed")
+    if ai=="x":
+        board[best_move[0]][best_move[1]].configure(bg=x_color,fg="black")
+        #label_board[best_move[0]][best_move[1]].configure(bg=x_color,fg="black")
+    else:
+        board[best_move[0]][best_move[1]].configure(bg=y_color,fg="black")
+        #label_board[best_move[0]][best_move[1]].configure(bg=y_color,fg="white")
+    print("evalAB move completed")
+    current=ai
+    isWin()
+    current=human
+
+def makeMoveInLabelBoard(best_move):
+    #global data_board
+    #print("inside make AI move. best move is",best_move)
+    #board[best_move[0]][best_move[1]].configure(text=ai)
+    print("move in label called from eval minmax")
+    label_board[best_move[0]][best_move[1]].configure(text=ai)
+    print("label_board configured")
+    #data_board[best_move[0]][best_move[1]]=ai
+    if ai=="x":
+        #board[best_move[0]][best_move[1]].configure(bg=x_color,fg="black")
+        label_board[best_move[0]][best_move[1]].configure(bg=x_color,fg="black")
+    else:
+        #board[best_move[0]][best_move[1]].configure(bg=y_color,fg="white")
+        label_board[best_move[0]][best_move[1]].configure(bg=y_color,fg="black")
+    print("eval minmax move completed")
 
 
-
-
-def plot(y):
-  
+def plot(y1,y2):  
     # the figure that will contain the plot
-    fig = Figure(figsize = (5, 5),
-                 dpi = 100)
- 
+    fig = Figure(figsize = (5, 5), dpi = 100)
+    
     # adding the subplot
     plot1 = fig.add_subplot(111,picker=True)
     # plotting the graph
-    plot1.plot(y)
+    
+    plot1.plot(y1,Label="Alpha-beta prunning",color="#ff004d")
+    plot1.plot(y2,Label="Minimax",color="#00fff5")
     plot1.set_xlabel("No. of Moves")
     plot1.set_ylabel("Decision time in seconds")
-    plot1.title.set_text("Time taken by AI to decide")
-    
-    #annot.set_visible(True)
+    plot1.legend(loc="upper left")
+    plot1.set_title("Time taken by AI to decide",color="#f6c90e")
 
     def update_annot(xdata,ydata,pos):
         annot.xy=pos
@@ -771,8 +818,7 @@ def plot(y):
     print("sub plot object",plot1)
     # creating the Tkinter canvas
     # containing the Matplotlib figure
-    canvas = FigureCanvasTkAgg(fig,
-                               master = root)  
+    canvas = FigureCanvasTkAgg(fig,master = root)  
 
     def onpick(event):
         print(event)    
@@ -787,21 +833,21 @@ def plot(y):
     canvas.draw()
   
     # placing the canvas on the Tkinter window
-    canvas.get_tk_widget().grid(row=0,column=size+1,rowspan=13)
+    canvas.get_tk_widget().grid(row=0,column=2*size+2,rowspan=13)
     annot = plot1.annotate("", xy=(0,0), xytext=(20,20),textcoords="offset points",bbox=dict(boxstyle="round", fc="w"),arrowprops=dict(arrowstyle="->"))
     annot.set_visible(False)
- 
 
-def playAi():
-    print("AI thinking")
+def evaluateAB():
+    global canPlay
     availMoves=getReducedMoves(data_board)
     availMoves=sortMoves(availMoves,data_board,ai)
     board=deepcopy(data_board)
     best_score=-9999999999
     best_move=None
     start=perf_counter()
+    ab_label.configure(text=ab_text+"thinking...",bg="#ff004d",fg="white")
     for l in availMoves:
-        print("inside play ai. avail moves are",availMoves)
+        print("inside eval ab. avail moves are",availMoves)
         board[l[0]][l[1]]=ai
         print("move played ",l," by O")
         result=minimax(board,human,-9999999999,9999999999,0)
@@ -812,9 +858,54 @@ def playAi():
     end=perf_counter()
     ttaken=end-start
     time_array.append(ttaken)
-    plot(y=time_array)
-    print("The time taken is",ttaken)
+    ab_label.configure(text=ab_text+"best move is({0},{1})".format(best_move[0],best_move[1]),bg="black",fg="#ff004d")
     makeAiMove(best_move)
+    print("evaluate AB finished")
+    canPlay=True
+    #plot(y1=time_array,y2=minmax_time_array)
+
+def evaluateMinMax():
+    global canPlay
+    availMoves=getReducedMoves(data_board_copy)
+    availMoves=sortMoves(availMoves,data_board_copy,ai)
+    board=deepcopy(data_board_copy)
+    best_score=-9999999999
+    best_move=None
+    start=perf_counter()
+    mm_label.configure(text=mm_text+"thinking...",bg="#00fff5",fg="black")
+    for l in availMoves:
+        print("inside play eval minmax. avail moves are",availMoves)
+        board[l[0]][l[1]]=ai
+        print("move played ",l," by O")
+        result=ominimax(board,human,0)
+        board[l[0]][l[1]]=0
+        if result > best_score:
+            best_move=l
+            best_score=result
+    end=perf_counter()
+    ttaken=end-start
+    minmax_time_array.append(ttaken)
+    mm_label.configure(text=mm_text+"best move is({0},{1})".format(best_move[0],best_move[1]),bg="black",fg="#00fff5")
+    makeMoveInLabelBoard(best_move)
+    canPlay=True
+    print("evaluate minmax finished")
+    #plot(y1=time_array,y2=minmax_time_array)
+
+
+def playAi():
+    global data_board_copy, minmaxFinished
+    print("AI thinking")
+    data_board_copy=copy(data_board)
+    p1=Thread(target=evaluateAB)
+    p2=Thread(target=evaluateMinMax)
+    p1.start()
+    p2.start()
+    """while(True):
+        if(minmaxFinished and abFinished):
+            print("checking lock")
+            break"""
+    minmaxFinished=False
+    plot(y1=time_array,y2=minmax_time_array)
     
     
 
@@ -825,6 +916,13 @@ def onClick(obj):                      #callback function for each button's clic
         canPlay=False 
         data_board[obj.row][obj.col]=current
         obj.configure(text=current)
+        label_board[obj.row][obj.col].configure(text=current)
+        if current=="x":
+            obj.configure(bg=x_color,fg="black")
+            label_board[obj.row][obj.col].configure(bg=x_color,fg="black")
+        else:
+            obj.configure(bg=y_color,fg="black")
+            label_board[obj.row][obj.col].configure(bg=y_color,fg="black")
         isWin()
         if current=="x":
             current="o"
@@ -833,14 +931,14 @@ def onClick(obj):                      #callback function for each button's clic
         n_move+=1
         if(n_move>=max_moves):
             print("draw")
-            exit()
+            indicator_label.configure(text="Game drawn :|")
+            #exit()
         if current==ai and win!=True:
             playAi()
             isWin()
             current=human
             n_move+=1
-    canPlay=True
-
+    
 
 
 #function to draw chart in GUI
@@ -848,9 +946,10 @@ def onClick(obj):                      #callback function for each button's clic
  
   
 root=Tk()
-root.title="Five in a row"
-root.geometry('1000x650')
-root_width=3
+root.configure(bg="black")
+root.title("Five in a row")
+root.geometry('1250x650')
+root_width=2
 print(root_width)
 root_height=2
 current="x"
@@ -858,14 +957,32 @@ root.resizable(False,False)
 Button.row=0
 Button.col=0
 Button.onClick=onClick
+
 for i in range(0,size):
     for j in range(0,size):
-        board[i][j]= Button(root, text = "")
+        board[i][j]= Button(root, text = "",bg="#26282b")
         board[i][j].row=i
         board[i][j].col=j
         board[i][j].configure(command=board[i][j].onClick,width=root_width,height=root_height)
         board[i][j].grid(column=j,row=i) # set Button grid
+
+for i in range(0,size):
+    l=Label(root,text="",width=1,height=root_height,bg="black")
+    l.grid(column=size+1,row=i)
+
+for i in range(0,size):
+    for j in range(0,size):
+        label_board[i][j]=Button(root,text="",width=root_width,height=root_height,bg="#26282b")
+        label_board[i][j].grid(column=size+2+j,row=i)
+ab_label=Label(root,text="Alpha Beta Prunning",bg="black",fg="#ff004d")
+ab_label.grid(column=0,row=size+1,columnspan=size)
+mm_label=Label(root,text="Minimax",bg="black",fg="#00fff5")
+mm_label.grid(column=size+1,row=size+1,columnspan=size)
 #playAi()
 #current="o"
 #n_move+=1
+font=Font(size=15)
+indicator_label=Label(root,text="Please play on the left-side board.",bg="black",fg="#ffd700",font=font)
+indicator_label.grid(column=2*size+1,row=size-2,columnspan=size)
+plot(y1=time_array,y2=minmax_time_array)
 root.mainloop()  #render screen
