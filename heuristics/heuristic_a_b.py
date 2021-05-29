@@ -36,11 +36,17 @@ ai="o"
 depth=2
 time_array=[0]
 minmax_time_array=[0]
+ab_moves_array=[0]
+minmax_moves_array=[0]
+eval_scores_array=[0]
 ab_text="Alpha Beta Prunning "
 mm_text="Minimax "
 
 x_color="#c327ab"
 y_color="#ffc045"
+ab_ni=0
+minmax_ni=0
+
 
 def getReducedMoves(board):            #function returns list of relavant available moves
     availMoves=set()
@@ -670,6 +676,7 @@ def sortMoves(availMoves,board,player):
                 
 #ordinary minmax
 def ominimax(board,player,current):
+    global minmax_ni
     availMoves=getReducedMoves(board)
     availMoves=sortMoves(availMoves,board,player)
     if (current+1)>=depth:
@@ -689,6 +696,7 @@ def ominimax(board,player,current):
             best_score=9999999999
             nextPlayer=ai
         for i in range(len(availMoves)):
+            minmax_ni+=1
             move=availMoves[i]
             board[move[0]][move[1]]=player
             print("move played ",move,"by ", player)
@@ -709,6 +717,7 @@ def ominimax(board,player,current):
 
 
 def minimax(board,player,alpha,beta,current):
+    global ab_ni
     availMoves=getReducedMoves(board)
     availMoves=sortMoves(availMoves,board,player)
     if (current+1)>=depth:
@@ -727,6 +736,7 @@ def minimax(board,player,alpha,beta,current):
             best_score=9999999999
             nextPlayer=ai
         for i in range(len(availMoves)):
+            ab_ni+=1
             move=availMoves[i]
             board[move[0]][move[1]]=player
             print("move played ",move,"by ", player)
@@ -784,10 +794,115 @@ def makeMoveInLabelBoard(best_move):
         label_board[best_move[0]][best_move[1]].configure(bg=y_color,fg="black")
     print("eval minmax move completed")
 
+def evalplot(y1):  
+    # the figure that will contain the plot
+    fig = Figure(figsize = (6, 2), dpi = 100)
+    
+    # adding the subplot
+    plot1 = fig.add_subplot(111,picker=True)
+    # plotting the graph
+    
+    plot1.plot(y1,color="#ff004d")
+    #plot1.plot(y2,Label="Minimax",color="#00fff5")
+    plot1.set_xlabel("Moves")
+    plot1.set_ylabel("AI evaluation score")
+    plot1.legend(loc="upper left")
+    plot1.set_title("AI score(+score favours player,-ve->AI)",color="#f6c90e")
+
+    def update_annot(xdata,ydata,pos):
+        annot.xy=pos
+        #annot.y=pos[1]
+        vis=annot.get_visible()
+        if vis:
+            annot.set_visible(False)
+            fig.canvas.draw_idle()
+        else:
+            text =str(round(ydata))
+            annot.set_text(text)
+            annot.get_bbox_patch().set_alpha(0.4)
+            annot.set_visible(True)
+            fig.canvas.draw_idle()
+        return
+
+    print("sub plot object",plot1)
+    # creating the Tkinter canvas
+    # containing the Matplotlib figure
+    canvas = FigureCanvasTkAgg(fig,master = root)  
+
+    def onpick(event):
+        print(event)    
+        xdata=event.mouseevent.xdata
+        ydata=event.mouseevent.ydata
+        pos=(xdata,ydata)
+        print("click loc",pos)
+        update_annot(xdata=xdata,ydata=ydata,pos=pos)
+        return
+    
+    canvas.mpl_connect('pick_event', onpick)
+    canvas.draw()
+  
+    # placing the canvas on the Tkinter window
+    canvas.get_tk_widget().grid(row=11,column=2*size+2,rowspan=8)
+    annot = plot1.annotate("", xy=(0,0), xytext=(20,20),textcoords="offset points",bbox=dict(boxstyle="round", fc="w"),arrowprops=dict(arrowstyle="->"))
+    annot.set_visible(False)
+
+
+def movesplot(y1,y2):  
+    # the figure that will contain the plot
+    fig = Figure(figsize = (6, 2), dpi = 100)
+    
+    # adding the subplot
+    plot1 = fig.add_subplot(111,picker=True)
+    # plotting the graph
+    
+    plot1.plot(y1,Label="Alpha-beta prunning",color="#ff004d")
+    plot1.plot(y2,Label="Minimax",color="#00fff5")
+    plot1.set_xlabel("Moves")
+    plot1.set_ylabel("Number of moves evaluated")
+    plot1.legend(loc="upper left")
+    plot1.set_title("Number of moves calculated",color="#f6c90e")
+
+    def update_annot(xdata,ydata,pos):
+        annot.xy=pos
+        #annot.y=pos[1]
+        vis=annot.get_visible()
+        if vis:
+            annot.set_visible(False)
+            fig.canvas.draw_idle()
+        else:
+            text =str(round(ydata))
+            annot.set_text(text)
+            annot.get_bbox_patch().set_alpha(0.4)
+            annot.set_visible(True)
+            fig.canvas.draw_idle()
+        return
+
+    print("sub plot object",plot1)
+    # creating the Tkinter canvas
+    # containing the Matplotlib figure
+    canvas = FigureCanvasTkAgg(fig,master = root)  
+
+    def onpick(event):
+        print(event)    
+        xdata=event.mouseevent.xdata
+        ydata=event.mouseevent.ydata
+        pos=(xdata,ydata)
+        print("click loc",pos)
+        update_annot(xdata=xdata,ydata=ydata,pos=pos)
+        return
+    
+    canvas.mpl_connect('pick_event', onpick)
+    canvas.draw()
+  
+    # placing the canvas on the Tkinter window
+    canvas.get_tk_widget().grid(row=4,column=2*size+2,rowspan=8)
+    annot = plot1.annotate("", xy=(0,0), xytext=(20,20),textcoords="offset points",bbox=dict(boxstyle="round", fc="w"),arrowprops=dict(arrowstyle="->"))
+    annot.set_visible(False)
+
 
 def plot(y1,y2):  
     # the figure that will contain the plot
-    fig = Figure(figsize = (5, 5), dpi = 100)
+    fig = Figure(figsize = (6, 2), dpi = 100)
     
     # adding the subplot
     plot1 = fig.add_subplot(111,picker=True)
@@ -833,12 +948,12 @@ def plot(y1,y2):
     canvas.draw()
   
     # placing the canvas on the Tkinter window
-    canvas.get_tk_widget().grid(row=0,column=2*size+2,rowspan=13)
+    canvas.get_tk_widget().grid(row=0,column=2*size+2,rowspan=6)
     annot = plot1.annotate("", xy=(0,0), xytext=(20,20),textcoords="offset points",bbox=dict(boxstyle="round", fc="w"),arrowprops=dict(arrowstyle="->"))
     annot.set_visible(False)
 
 def evaluateAB():
-    global canPlay
+    global canPlay,ab_ni
     availMoves=getReducedMoves(data_board)
     availMoves=sortMoves(availMoves,data_board,ai)
     board=deepcopy(data_board)
@@ -852,12 +967,15 @@ def evaluateAB():
         print("move played ",l," by O")
         result=minimax(board,human,-9999999999,9999999999,0)
         board[l[0]][l[1]]=0
+        ab_ni+=1
         if result > best_score:
             best_move=l
             best_score=result
     end=perf_counter()
     ttaken=end-start
     time_array.append(ttaken)
+    ab_moves_array.append(ab_ni)
+    ab_ni=0
     ab_label.configure(text=ab_text+"best move is({0},{1})".format(best_move[0],best_move[1]),bg="black",fg="#ff004d")
     makeAiMove(best_move)
     print("evaluate AB finished")
@@ -865,7 +983,7 @@ def evaluateAB():
     #plot(y1=time_array,y2=minmax_time_array)
 
 def evaluateMinMax():
-    global canPlay
+    global canPlay,minmax_ni
     availMoves=getReducedMoves(data_board_copy)
     availMoves=sortMoves(availMoves,data_board_copy,ai)
     board=deepcopy(data_board_copy)
@@ -876,6 +994,7 @@ def evaluateMinMax():
     for l in availMoves:
         print("inside play eval minmax. avail moves are",availMoves)
         board[l[0]][l[1]]=ai
+        minmax_ni+=1
         print("move played ",l," by O")
         result=ominimax(board,human,0)
         board[l[0]][l[1]]=0
@@ -885,6 +1004,8 @@ def evaluateMinMax():
     end=perf_counter()
     ttaken=end-start
     minmax_time_array.append(ttaken)
+    minmax_moves_array.append(minmax_ni)
+    minmax_ni=0
     mm_label.configure(text=mm_text+"best move is({0},{1})".format(best_move[0],best_move[1]),bg="black",fg="#00fff5")
     makeMoveInLabelBoard(best_move)
     canPlay=True
@@ -905,8 +1026,11 @@ def playAi():
             print("checking lock")
             break"""
     minmaxFinished=False
+    ev=heuristic("x",data_board)-heuristic("o",data_board)
+    eval_scores_array.append(ev)
     plot(y1=time_array,y2=minmax_time_array)
-    
+    movesplot(y1=ab_moves_array,y2=minmax_moves_array)
+    evalplot(y1=eval_scores_array)
     
 
 def onClick(obj):                      #callback function for each button's click
@@ -940,15 +1064,23 @@ def onClick(obj):                      #callback function for each button's clic
             n_move+=1
     
 
-
-#function to draw chart in GUI
-
+#refresh minmax board if it makes a different decision than minimax
+def refresh():
+    print("refreshing board")
+    for i in range(size):
+        for j in range(size):
+            if data_board[i][j]=="x":
+                label_board[i][j].configure(text="x",bg=x_color)
+            elif data_board[i][j]=="o":
+                label_board[i][j].configure(text="o",bg=y_color)
+            else:
+                label_board[i][j].configure(text="",bg="#26282b")
  
   
 root=Tk()
 root.configure(bg="black")
 root.title("Five in a row")
-root.geometry('1250x650')
+root.geometry('1300x700')
 root_width=2
 print(root_width)
 root_height=2
@@ -972,7 +1104,7 @@ for i in range(0,size):
 
 for i in range(0,size):
     for j in range(0,size):
-        label_board[i][j]=Button(root,text="",width=root_width,height=root_height,bg="#26282b")
+        label_board[i][j]=Button(root,text="",width=root_width,height=root_height,bg="#26282b",command=refresh)
         label_board[i][j].grid(column=size+2+j,row=i)
 ab_label=Label(root,text="Alpha Beta Prunning",bg="black",fg="#ff004d")
 ab_label.grid(column=0,row=size+1,columnspan=size)
@@ -983,6 +1115,8 @@ mm_label.grid(column=size+1,row=size+1,columnspan=size)
 #n_move+=1
 font=Font(size=15)
 indicator_label=Label(root,text="Please play on the left-side board.",bg="black",fg="#ffd700",font=font)
-indicator_label.grid(column=2*size+1,row=size-2,columnspan=size)
+indicator_label.grid(column=10,row=18,columnspan=size)
 plot(y1=time_array,y2=minmax_time_array)
+movesplot(y1=ab_moves_array,y2=minmax_moves_array)
+evalplot(y1=eval_scores_array)
 root.mainloop()  #render screen

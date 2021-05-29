@@ -241,7 +241,7 @@ def onClick(obj):                      #callback function for each button's clic
 
 
 root=Tk()
-root.title="Five in a row"
+root.title("Tic-Tac-Toe")
 root.geometry('500x650')
 root_width=3
 print(root_width)
