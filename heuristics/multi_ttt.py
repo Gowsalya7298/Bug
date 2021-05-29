@@ -164,19 +164,19 @@ def checkColumns(data_board,current=current):
 
 def isWin():
     global win
-    print("is win called","current player is",current)
+    #print("is win called","current player is",current)
     if checkColumns(data_board,current):
         win=True
-        print(current," player won!"," win is",win)
+        #print(current," player won!"," win is",win)
     elif checkRows(data_board,current):
         win=True
-        print(current," player won!"," win is",win)
+        #print(current," player won!"," win is",win)
     elif checkDiagonals(data_board,current):
         win=True
-        print(current," player won!"," win is",win)
+        #print(current," player won!"," win is",win)
     if win==True:
         indicator_label.configure(text="{0} player won!".format(current))
-    print("game still continues")
+    #print("game still continues")
 
 def evaluate_rows(row,col,player,board):
     if player=="x":
@@ -695,7 +695,7 @@ def ominimax(board,player):
             minmax_ni+=1
             move=availMoves[i]
             board[move[0]][move[1]]=player
-            print("move played ",move,"by ", player)
+            #print("move played ",move,"by ", player)
             result=ominimax(board,nextPlayer)
             board[move[0]][move[1]]=0
             if player==ai:
@@ -733,7 +733,7 @@ def minimax(board,player,alpha,beta):
             ab_ni+=1
             move=availMoves[i]
             board[move[0]][move[1]]=player
-            print("move played ",move,"by ", player)
+            #print("move played ",move,"by ", player)
             result=minimax(board,nextPlayer,alpha=alpha,beta=beta)
             board[move[0]][move[1]]=0
             if player==ai:
@@ -754,30 +754,30 @@ def minimax(board,player,alpha,beta):
 
 def makeAiMove(best_move):
     global data_board,current
-    print(" make AI move, called from evalAB. best move is",best_move)
+    #print(" make AI move, called from evalAB. best move is",best_move)
     board[best_move[0]][best_move[1]].configure(text=ai)
-    print("data_board configured")
+    #print("data_board configured")
     #label_board[best_move[0]][best_move[1]].configure(text=ai)
     data_board[best_move[0]][best_move[1]]=ai
-    print("data board changed")
+    #print("data board changed")
     if ai=="x":
         board[best_move[0]][best_move[1]].configure(bg=x_color,fg="black")
         #label_board[best_move[0]][best_move[1]].configure(bg=x_color,fg="black")
     else:
         board[best_move[0]][best_move[1]].configure(bg=y_color,fg="black")
         #label_board[best_move[0]][best_move[1]].configure(bg=y_color,fg="white")
-    print("evalAB move completed")
+    #print("evalAB move completed")
     current=ai
     isWin()
     current=human
 
 def makeMoveInLabelBoard(best_move):
     #global data_board
-    #print("inside make AI move. best move is",best_move)
+    ##print("inside make AI move. best move is",best_move)
     #board[best_move[0]][best_move[1]].configure(text=ai)
-    print("move in label called from eval minmax")
+    #print("move in label called from eval minmax")
     label_board[best_move[0]][best_move[1]].configure(text=ai)
-    print("label_board configured")
+    #print("label_board configured")
     #data_board[best_move[0]][best_move[1]]=ai
     if ai=="x":
         #board[best_move[0]][best_move[1]].configure(bg=x_color,fg="black")
@@ -785,7 +785,7 @@ def makeMoveInLabelBoard(best_move):
     else:
         #board[best_move[0]][best_move[1]].configure(bg=y_color,fg="white")
         label_board[best_move[0]][best_move[1]].configure(bg=y_color,fg="black")
-    print("eval minmax move completed")
+    #print("eval minmax move completed")
 
 def evalplot(y1):  
     # the figure that will contain the plot
@@ -799,7 +799,7 @@ def evalplot(y1):
     #plot1.plot(y2,Label="Minimax",color="#00fff5")
     plot1.set_xlabel("Moves")
     plot1.set_ylabel("AI evaluation score")
-    plot1.legend(loc="upper left")
+    plot1.legend(["Alpha-beta prunning","Minmax"],loc="upper left")
     plot1.set_title("AI score(+score favours player,-ve->AI)",color="#f6c90e")
 
     def update_annot(xdata,ydata,pos):
@@ -817,17 +817,17 @@ def evalplot(y1):
             fig.canvas.draw_idle()
         return
 
-    print("sub plot object",plot1)
+    #print("sub plot object",plot1)
     # creating the Tkinter canvas
     # containing the Matplotlib figure
     canvas = FigureCanvasTkAgg(fig,master = root)  
 
     def onpick(event):
-        print(event)    
+        #print(event)    
         xdata=event.mouseevent.xdata
         ydata=event.mouseevent.ydata
         pos=(xdata,ydata)
-        print("click loc",pos)
+        #print("click loc",pos)
         update_annot(xdata=xdata,ydata=ydata,pos=pos)
         return
     
@@ -852,7 +852,7 @@ def movesplot(y1,y2):
     plot1.plot(y2,Label="Minimax",color="#00fff5")
     plot1.set_xlabel("Moves")
     plot1.set_ylabel("Number of moves evaluated")
-    plot1.legend(loc="upper left")
+    plot1.legend(["Alpha-beta prunning","Minmax"],loc="upper left")
     plot1.set_title("Number of moves calculated",color="#f6c90e")
 
     def update_annot(xdata,ydata,pos):
@@ -870,17 +870,17 @@ def movesplot(y1,y2):
             fig.canvas.draw_idle()
         return
 
-    print("sub plot object",plot1)
+    #print("sub plot object",plot1)
     # creating the Tkinter canvas
     # containing the Matplotlib figure
     canvas = FigureCanvasTkAgg(fig,master = root)  
 
     def onpick(event):
-        print(event)    
+        #print(event)    
         xdata=event.mouseevent.xdata
         ydata=event.mouseevent.ydata
         pos=(xdata,ydata)
-        print("click loc",pos)
+        #print("click loc",pos)
         update_annot(xdata=xdata,ydata=ydata,pos=pos)
         return
     
@@ -905,7 +905,7 @@ def plot(y1,y2):
     plot1.plot(y2,Label="Minimax",color="#00fff5")
     plot1.set_xlabel("No. of Moves")
     plot1.set_ylabel("Decision time in seconds")
-    plot1.legend(loc="upper left")
+    plot1.legend(["Alpha-beta prunning","Minmax"],loc="upper left")
     plot1.set_title("Time taken by AI to decide",color="#f6c90e")
 
     def update_annot(xdata,ydata,pos):
@@ -923,17 +923,17 @@ def plot(y1,y2):
             fig.canvas.draw_idle()
         return
 
-    print("sub plot object",plot1)
+    #print("sub plot object",plot1)
     # creating the Tkinter canvas
     # containing the Matplotlib figure
     canvas = FigureCanvasTkAgg(fig,master = root)  
 
     def onpick(event):
-        print(event)    
+        #print(event)    
         xdata=event.mouseevent.xdata
         ydata=event.mouseevent.ydata
         pos=(xdata,ydata)
-        print("click loc",pos)
+        #print("click loc",pos)
         update_annot(xdata=xdata,ydata=ydata,pos=pos)
         return
     
@@ -955,9 +955,9 @@ def evaluateAB():
     start=perf_counter()
     ab_label.configure(text="thinking...",bg="#ff004d",fg="white")
     for l in availMoves:
-        print("inside eval ab. avail moves are",availMoves)
+        #print("inside eval ab. avail moves are",availMoves)
         board[l[0]][l[1]]=ai
-        print("move played ",l," by O")
+        #print("move played ",l," by O")
         result=minimax(board,human,-99,99)
         board[l[0]][l[1]]=0
         ab_ni+=1
@@ -971,7 +971,7 @@ def evaluateAB():
     ab_ni=0
     ab_label.configure(text=ab_text,bg="black",fg="#ff004d")
     makeAiMove(best_move)
-    print("evaluate AB finished")
+    #print("evaluate AB finished")
     canPlay=True
     #plot(y1=time_array,y2=minmax_time_array)
 
@@ -985,10 +985,10 @@ def evaluateMinMax():
     start=perf_counter()
     mm_label.configure(text="thinking...",bg="#00fff5",fg="black")
     for l in availMoves:
-        print("inside play eval minmax. avail moves are",availMoves)
+        #print("inside play eval minmax. avail moves are",availMoves)
         board[l[0]][l[1]]=ai
         minmax_ni+=1
-        print("move played ",l," by O")
+        #print("move played ",l," by O")
         result=ominimax(board,human)
         board[l[0]][l[1]]=0
         if result > best_score:
@@ -1002,13 +1002,13 @@ def evaluateMinMax():
     mm_label.configure(text=mm_text,bg="black",fg="#00fff5")
     makeMoveInLabelBoard(best_move)
     canPlay=True
-    print("evaluate minmax finished")
+    #print("evaluate minmax finished")
     #plot(y1=time_array,y2=minmax_time_array)
 
 
 def playAi():
     global data_board_copy, minmaxFinished
-    print("AI thinking")
+    #print("AI thinking")
     data_board_copy=copy(data_board)
     p1=Thread(target=evaluateAB)
     p2=Thread(target=evaluateMinMax)
@@ -1016,7 +1016,7 @@ def playAi():
     p2.start()
     """while(True):
         if(minmaxFinished and abFinished):
-            print("checking lock")
+            #print("checking lock")
             break"""
     minmaxFinished=False
     plot(y1=time_array,y2=minmax_time_array)
@@ -1025,7 +1025,7 @@ def playAi():
 
 def onClick(obj):                      #callback function for each button's click
     global current, n_move, canPlay
-    print("(",obj.row,",",obj.col,")","is clicked"," win is",win)
+    #print("(",obj.row,",",obj.col,")","is clicked"," win is",win)
     if (win==False and data_board[obj.row][obj.col]==0 and canPlay):
         canPlay=False 
         data_board[obj.row][obj.col]=current
@@ -1044,7 +1044,7 @@ def onClick(obj):                      #callback function for each button's clic
             current="x"
         n_move+=1
         if(n_move>=max_moves):
-            print("draw")
+            #print("draw")
             indicator_label.configure(text="Game drawn :|")
             #exit()
         if current==ai and win!=True:
@@ -1056,7 +1056,7 @@ def onClick(obj):                      #callback function for each button's clic
 
 #refresh minmax board if it makes a different decision than minimax
 def refresh():
-    print("refreshing board")
+    #print("refreshing board")
     for i in range(size):
         for j in range(size):
             if data_board[i][j]=="x":
@@ -1070,9 +1070,9 @@ def refresh():
 root=Tk()
 root.configure(bg="black")
 root.title("Tic-Tac-Toe")
-root.geometry('1300x700')
+root.geometry('900x500')
 root_width=2
-print(root_width)
+##print(root_width)
 root_height=2
 current="x"
 root.resizable(False,False)

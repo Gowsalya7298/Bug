@@ -8,8 +8,7 @@ root=Tk()
 root.geometry('800x600')
 
 # Welcome label
-welcome = Label(root, text="Welcome!", padding=(30,20), 
-                                            font=("Helvetica", "16", "bold"))
+welcome = Label(root, text="Welcome!", padding=(30,20),font=("Helvetica", "16", "bold"))
 welcome.pack()
 
 #Select game
@@ -18,13 +17,13 @@ selectGame.pack()
 
 #Function for play button
 def playTicTacToe():
-    print("tic tac toe")
+    #print("tic tac toe")
     global size
     size=3
     playButton.pack(pady=60)
 
 def playFiveInARow():
-    print("Five in a row")
+    #print("Five in a row")
     selectDepth.pack()
     drop.pack()
     global size
@@ -32,21 +31,21 @@ def playFiveInARow():
     playButton.pack(pady=60)
 
 def play():
-    print(size)
+    #print(size)
     if size==3:
         root.destroy()
         os.system('python ./heuristics/multi_ttt.py')
     
     if size==15:
         root.destroy()
-        print("depth: "+str(clicked.get()))
+        #print("depth: "+str(clicked.get()))
         global depth
         depth=clicked.get()
         #path = 'python ./heuristics/heuristic_a_b.py '+str(depth)
         os.system("python ./heuristics/heuristic_a_b.py {depth}".format(depth=depth))
 
 def getSize():
-    print(size)
+    #print(size)
     return size
 
 def getDepth():
